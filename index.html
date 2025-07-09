@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %} - {{ t['game_library'] }}{% endblock %}
+
+{% block content %}
+<h1>{{ t['platform_name'] }} {{ t['game_library'] }}</h1>
+<div class="game-list">
+    {% for game in games %}
+    <div class="game-card">
+        <img src="{{ game.image_url }}" alt="{{ game.title }}" />
+        <h2>{{ game.title }}</h2>
+        <p>{{ game.description }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

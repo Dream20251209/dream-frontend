@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %} - {{ t['login'] }}{% endblock %}
+
+{% block content %}
+<h2>{{ t['login'] }} {{ t['platform_name'] }}</h2>
+
+<form method="POST" action="{{ url_for('auth.login') }}">
+    <label for="email">{{ t['email'] }}</label><br />
+    <input type="email" id="email" name="email" required /><br />
+
+    <label for="password">{{ t['password'] }}</label><br />
+    <input type="password" id="password" name="password" required /><br />
+
+    <!-- 忘記密碼連結 -->
+    <small>
+        <a href="{{ url_for('auth.forgot_password') }}">{{ t['forgot_password'] or '忘記密碼？' }}</a>
+    </small><br /><br />
+
+    <button type="submit">{{ t['login'] }}</button>
+</form>
+
+<p>
+    {{ t['no_account'] }}
+    <a href="{{ url_for('auth.register') }}">{{ t['register'] }}</a>
+</p>
+{% endblock %}

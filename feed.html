@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}貼文牆{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">📷 Dream 平台 - 貼文牆</h2>
+    <a href="{{ url_for('post.create_post') }}" class="btn btn-primary mb-4">➕ 發佈新貼文</a>
+
+    {% if posts %}
+        {% for post in posts %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    使用者：{{ post.user.email }} | 發布時間：{{ post.created_at.strftime('%Y-%m-%d %H:%M') }}
+                </div>
+                <div class="card-body">
+                    {% if post.caption %}
+                        <p class="fw-bold">{{ post.caption }}</p>
+                    {% endif %}
+                    {% if post.content %}
+                        <p>{{ post.content }}</p>
+                    {% endif %}
+                    
+                    {% if post.media_type == 'image' %}
+                        <img src="{{ post.media_url }}" class="img-fluid rounded mt-2" alt="貼文圖片">
+                    {% elif post.media_type == 'video' %}
+                        <video controls class="w-100 mt-2">
+                            <source src="{{ post.media_url }}" type="video/mp4">
+                            您的瀏覽器不支援影片播放。
+                        </video>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-muted">目前尚無貼文。</p>
+    {% endif %}
+
+    <hr>
+    <h3>留言區</h3>
+    <form method="POST" action="{{ url_for('comments.comments') }}">
+        <textarea name="content" rows="4" class="form-control" placeholder="留下你的留言..." required></textarea>
+        <button type="submit" class="btn btn-success mt-2">發表留言</button>
+    </form>
+
+    <div class="comments-list mt-4">
+        {% for comment in comments %}
+            <div class="border rounded p-3 mb-3">
+                <strong>{{ users[comment.user_id] }}</strong>
+                <span class="text-muted ms-2">{{ comment.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                {% if comment.edited_at %}
+                    <small class="text-muted">(已編輯)</small>
+                {% endif %}
+                <p class="mt-2">{{ comment.content }}</p>
+
+                {% if session.get('user_id') == comment.user_id %}
+                    {% if (comment.created_at + timedelta(minutes=10)) > datetime.utcnow() %}
+                        <form method="POST" action="{{ url_for('comments.edit_comment', comment_id=comment.id) }}">
+                            <textarea name="content" rows="2" class="form-control">{{ comment.content }}</textarea>
+                            <button type="submit" class="btn btn-primary btn-sm mt-1">編輯留言</button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+            </div>
+        {% else %}
+            <p class="text-muted">目前尚無留言。</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
