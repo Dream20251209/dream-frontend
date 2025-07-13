@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="{{ lang or 'zh-TW' }}">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ t['site_title'] }}{% block title %}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">{{ t['site_title'] }}</a>  <!-- ✅ 改為可翻譯 -->
+
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('post.create_post') }}">{{ t['create_post'] }}</a></li>  <!-- ✅ -->
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('post.post_feed') }}">{{ t['post_feed'] }}</a></li>    <!-- ✅ -->
+
+        {% if session.get('user_id') %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.profile') }}">{{ t['profile'] }}</a></li>
+          {% if session.get('is_admin') %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.dashboard') }}">{{ t['admin_dashboard'] }}</a></li>  <!-- ✅ -->
+          {% endif %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">{{ t['logout'] }}</a></li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">{{ t['login'] }}</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.register') }}">{{ t['register'] }}</a></li>
+        {% endif %}
+      </ul>
+
+      <form action="{{ url_for('set_language') }}" method="post" class="form-inline ml-3">
+        <label for="lang-select">{{ t['language'] }}:</label>
+        <select name="lang" id="lang-select" onchange="this.form.submit()" class="ml-2">
+          <option value="zh" {% if lang == 'zh' %}selected{% endif %}>{{ t['zh'] }}</option>
+          <option value="en" {% if lang == 'en' %}selected{% endif %}>{{ t['en'] }}</option>
+          <option value="ja" {% if lang == 'ja' %}selected{% endif %}>{{ t['ja'] }}</option>
+          <option value="ko" {% if lang == 'ko' %}selected{% endif %}>{{ t['ko'] }}</option>
+          <option value="fr" {% if lang == 'fr' %}selected{% endif %}>{{ t['fr'] }}</option>
+          <option value="de" {% if lang == 'de' %}selected{% endif %}>{{ t['de'] }}</option>
+        </select>
+      </form>
+    </div>
+  </nav>
+
+  <main class="container mt-4">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flash-messages">
+          {% for category, msg in messages %}
+            <li class="{{ category }}">{{ msg }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
